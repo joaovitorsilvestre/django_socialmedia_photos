@@ -11,6 +11,12 @@
     <body style="width:100%; height:90%">
         <div style="width: 100%; height: 100%;">
             <div id="header_box">
+                <div id="search_box" type="text">
+                    <input id="search_input" type="text" placeholder="pesquisar..." onfocus="display_search(true);" onblur="display_search(false);"/>
+                    <div id="display_search_box">
+                    </div>
+                </div>
+
                 <div id="login_input_box">
                     {% if active == False %}
                         <form method="post">

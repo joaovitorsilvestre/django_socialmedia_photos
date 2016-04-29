@@ -7,3 +7,13 @@ function login_over(on) {
         login_button.style.backgroundColor = "#204A52"
     }
 }
+
+function display_search(on) {
+    var display_search_box = document.getElementById("display_search_box")
+    if (on == true){
+      display_search_box.style.display = "inline"
+    }
+    else {
+      display_search_box.style.display = "none"
+    }
+}
