@@ -18,13 +18,23 @@ function display_search(on) {
     }
 }
 
-function teste() {
-    var bnt = document.createElement("BUTTON");
-    var b_t = document.createElement(results[0]);
-
-    bnt.appendChild(b_t);
+function filtrar_resultados(texto_pesquisa) {
     var display_search_box = document.getElementById('display_search_box');
-    display_search_box.appendChild(bnt);
 
-    //return results[0]
+    while( display_search_box.hasChildNodes()) {
+        display_search_box.removeChild(display_search_box.lastChild);
+    }
+
+    for (i = 0; i < results.length; i++) {            // para cada item no results
+
+      if (results[i].indexOf(texto_pesquisa) > -1) {       // verifica se o texto digitado está no item atual do for
+          var bnt = document.createElement("BUTTON");       //cria um elemento button
+          var b_t = document.createTextNode(results[i]);    // cria um elemento texto
+
+          bnt.appendChild(b_t);                             //adiciona o texto ao botao
+          display_search_box.appendChild(bnt);              //adiciona ao div
+      }
+    }
+
+    return results[0]
 }
