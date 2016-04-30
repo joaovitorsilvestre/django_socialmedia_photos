@@ -34,6 +34,6 @@ def Home(request):
                 else:
                     return HttpResponse('Inactive user')
             else:
-                return render(request, 'home/home.html', {'fail':True, 'active':False, 'usuario':usuario})
+                return render(request, 'home/home.html', {'fail':True, 'active':False, 'usuario':usuario, 'results': results})
 
-    return render(request, 'home/home.html', {'active':active, 'usuario': usuario})
+    return render(request, 'home/home.html', {'active':active, 'usuario': usuario, 'results': results})

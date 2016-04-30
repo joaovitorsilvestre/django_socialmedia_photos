@@ -30,6 +30,17 @@
     background-color: #2F6C78;
 }
 
+.item_search {
+    width: 90%;
+    height: 18px;
+    margin-left: 5%;
+    margin-top: 5px;
+    border: none;
+    font: italic 16px "", Arial;
+    color: white;
+    background-color: #4EB2C4;
+}
+
 #login_input_box {
     float: right;
     width: 30%;
