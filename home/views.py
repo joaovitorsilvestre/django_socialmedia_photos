@@ -2,14 +2,23 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django_socialmedia_photos import settings
+from accounts.models import Usuario
+import json
 
 def Home(request):
     active = request.user.is_authenticated()
 
     usuario = request.user
 
+    todos_usuarios = []
+    for u in Usuario.objects.all().values_list('username', flat=True):
+        todos_usuarios.append(u)
+
+    results = json.dumps(todos_usuarios)
+
+
     if active == True:
-        return render(request, 'home/home.html', {'active':True, 'usuario':usuario})
+        return render(request, 'home/home.html', {'active':True, 'usuario':usuario, 'results': results})
     else:
         next = request.GET.get('next', '/home/')
         if request.method == 'POST':

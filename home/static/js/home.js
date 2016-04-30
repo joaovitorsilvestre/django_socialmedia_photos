@@ -17,3 +17,14 @@ function display_search(on) {
       display_search_box.style.display = "none"
     }
 }
+
+function teste() {
+    var bnt = document.createElement("BUTTON");
+    var b_t = document.createElement(results[0]);
+
+    bnt.appendChild(b_t);
+    var display_search_box = document.getElementById('display_search_box');
+    display_search_box.appendChild(bnt);
+
+    //return results[0]
+}
