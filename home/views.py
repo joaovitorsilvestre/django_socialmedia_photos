@@ -37,3 +37,7 @@ def Home(request):
                 return render(request, 'home/home.html', {'fail':True, 'active':False, 'usuario':usuario, 'results': results})
 
     return render(request, 'home/home.html', {'active':active, 'usuario': usuario, 'results': results})
+
+
+def Usuario_page(request, usuario_page):
+    return HttpResponse('Esta é a pagina do(a) '+ usuario_page)
