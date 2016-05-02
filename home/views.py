@@ -5,54 +5,46 @@ from django_socialmedia_photos import settings
 from accounts.models import Usuario
 import json
 
-'''
+
 #ESSA class É DA FUNCIONALIDADE DA HEADER
-class header():
-    def __init__(self):
+class header_objeto(object):
+    def __init__(self,request):
+        self.request = request
         self.active = request.user.is_authenticated()
         self.usuario = request.user
         self.todos_usuarios = []
         self.todos_usuarios = []
         for u in Usuario.objects.all().values_list('username', flat=True):
             self.todos_usuarios.append(u)
-        self.results = json.dumps(todos_usuarios)
 
-    def active(self):
+        self.results = json.dumps(self.todos_usuarios)
+
+    def logica_login(self):
         if self.active == True:
-'''            
+            return render(self.request, 'home/home.html', {'active':True, 'usuario':self.usuario, 'results': self.results})
+        else:
+            next = self.request.GET.get('next', '/home/')
+            if self.request.method == 'POST':
+                username = self.request.POST['username']
+                password = self.request.POST['password']
+
+                user = authenticate(username=username, password=password) # ele tenta autenticar o usuario, se não conseguir ele retorna None
+
+                if user is not None:   # se o user NÃO retornar None então ele executa
+                    if user.is_active:
+                        login(self.request, user)
+                        return HttpResponseRedirect(next)
+                    else:
+                        return HttpResponse('Inactive user')
+                else:
+                    return render(self.request, 'home/home.html', {'fail':True, 'active':False, 'usuario': self.usuario, 'results': self.results})
+
 
 def Home(request):
-    active = request.user.is_authenticated()
+    header = header_objeto(request)
+    header.logica_login()
 
-    usuario = request.user
-
-    todos_usuarios = []
-    for u in Usuario.objects.all().values_list('username', flat=True):
-        todos_usuarios.append(u)
-
-    results = json.dumps(todos_usuarios)
-
-
-    if active == True:
-        return render(request, 'home/home.html', {'active':True, 'usuario':usuario, 'results': results})
-    else:
-        next = request.GET.get('next', '/home/')
-        if request.method == 'POST':
-            username = request.POST['username']
-            password = request.POST['password']
-
-            user = authenticate(username=username, password=password) # ele tenta autenticar o usuario, se não conseguir ele retorna None
-
-            if user is not None:   # se o user NÃO retornar None então ele executa
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponseRedirect(next)
-                else:
-                    return HttpResponse('Inactive user')
-            else:
-                return render(request, 'home/home.html', {'fail':True, 'active':False, 'usuario':usuario, 'results': results})
-
-    return render(request, 'home/home.html', {'active':active, 'usuario': usuario, 'results': results})
+    return render(request, 'home/home.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results})
 
 
 def Usuario_page(request, nome_usuario_page):
