@@ -14,7 +14,7 @@ class header_objeto(object):
         self.usuario = request.user
         self.todos_usuarios = []
         self.todos_usuarios = []
-        for u in Usuario.objects.all().values_list('username', flat=True):
+        for u in Usuario.objects.all().values_list('name', flat=True):
             self.todos_usuarios.append(u)
 
         self.results = json.dumps(self.todos_usuarios)
@@ -39,13 +39,27 @@ class header_objeto(object):
                 else:
                     return render(self.request, 'home/home.html', {'fail':True, 'active':False, 'usuario': self.usuario, 'results': self.results})
 
+class usuario_other_data(object):
+    def __init__(self,usuario_encontrado):
+        self.name = usuario_encontrado.name
 
 def Home(request):
     header = header_objeto(request)
-    header.logica_login()
+    header.logica_login()                  ## esse metodo faz toda a verificação se o usuario está logado, ou não etc
 
     return render(request, 'home/home.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results})
 
 
-def Usuario_page(request, nome_usuario_page):
-    return render(request, 'home/usuario_other_page.html', {'nome_usuario_page':nome_usuario_page})
+def Usuario_page(request, usuario_other):
+    header = header_objeto(request)
+    header.logica_login()
+
+    for u in Usuario.objects.all():             ## para cada usuario registrado ele vai procurar
+        if u.name == usuario_other:          ## pelo que contem o mesmo username que o informado
+            usuario_encontrado = u
+            usuario_other = usuario_other_data(usuario_encontrado)  # essa variavel guarda o objeto usuario achado, por ex se seu procure por joao vaiter tudo sobre ele, pass, username etc
+            achado = True
+            break
+
+    return render(request, 'home/usuario_other_page.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results,
+                                                            'usuario_other':usuario_other})
