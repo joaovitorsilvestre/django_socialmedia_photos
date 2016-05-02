@@ -5,6 +5,22 @@ from django_socialmedia_photos import settings
 from accounts.models import Usuario
 import json
 
+'''
+#ESSA class É DA FUNCIONALIDADE DA HEADER
+class header():
+    def __init__(self):
+        self.active = request.user.is_authenticated()
+        self.usuario = request.user
+        self.todos_usuarios = []
+        self.todos_usuarios = []
+        for u in Usuario.objects.all().values_list('username', flat=True):
+            self.todos_usuarios.append(u)
+        self.results = json.dumps(todos_usuarios)
+
+    def active(self):
+        if self.active == True:
+'''            
+
 def Home(request):
     active = request.user.is_authenticated()
 
@@ -39,5 +55,5 @@ def Home(request):
     return render(request, 'home/home.html', {'active':active, 'usuario': usuario, 'results': results})
 
 
-def Usuario_page(request, usuario_page):
-    return HttpResponse('Esta é a pagina do(a) '+ usuario_page)
+def Usuario_page(request, nome_usuario_page):
+    return render(request, 'home/usuario_other_page.html', {'nome_usuario_page':nome_usuario_page})

@@ -1,0 +1,33 @@
+<link rel="stylesheet" type="text/css" href="../../static/css/home.css" >
+
+<!-- PARA PASSAR AS VARIAVEIS DO VIEWS.PY PARA O JV EXTERNO É NECESSARIO NOMEAR ANTES DE CARREGAR O JV EXTERNO, COMO ABAIXO -->
+<script>
+    var results = {{results|safe}}
+</script>
+
+<script type="text/javascript" src="../../static/js/home.js">
+</script>
+
+
+<div id="search_box" type="text">
+    <input id="search_input" type="text" placeholder="pesquisar..." onkeyup="filtrar_resultados(this.value);"/>
+    <div id="display_search_box">
+    </div>
+</div>
+
+<div id="login_input_box">
+    {% if active == False %}
+        <form method="post">
+            {% csrf_token %}
+                <input name="username" class="input_login" type="text" placeholder="username"/>
+                <input name="password" class="input_login" type="password" placeholder="pasword"/>
+                <input id="login_button" type="submit" value="Login" onmouseover="login_over(true);" onmouseout="login_over(false);" />
+                <a class="hide_buttons" href="/accounts/register">Register</a>
+        </form>
+    {% else %}
+        <label id="user_name">{{usuario.name}}</label>
+        <img src="/media/{{usuario.profile_image}}" id="profile_image" />
+        <a class="hide_buttons" href="/accounts/logout">Logout</a>
+        <a class="hide_buttons" href="/accounts/edit_profile">Edit Profile</a>
+    {% endif %}
+</div>
