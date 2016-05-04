@@ -39,9 +39,13 @@ class header_objeto(object):
                 else:
                     return render(self.request, 'home/home.html', {'fail':True, 'active':False, 'usuario': self.usuario, 'results': self.results})
 
+#ESSA classe é utilizada para ser enviada para o html, desta forma garantindo que apenas os dados abaixo sairão do servidor para o cliente
 class usuario_other_data(object):
     def __init__(self,usuario_encontrado):
+        jsonDec = json.decoder.JSONDecoder()
         self.name = usuario_encontrado.name
+        self.solicitacao = jsonDec.decode(usuario_encontrado.solicitacao)
+        #self.solicitacao = json.loads(usuario_encontrado.solicitacao)
 
 def Home(request):
     header = header_objeto(request)
@@ -49,8 +53,33 @@ def Home(request):
 
     return render(request, 'home/home.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results})
 
+def Upload_image(request):
+    usuario = request.user
+
+    if request.method == 'POST':
+        public_or_private = request.POST['public_or_private']
+        try:
+            imagens = request.FILES.getlist('imagens')
+        except:
+            imagens = None
+
+        if imagens != None:
+            if public_or_private == 'public':
+                for item in imagens:
+                    usuario.images_public = item
+                    usuario.save()
+                return HttpResponse('imagens upadas com sucesso')
+            elif public_or_private == 'private':
+                return HttpResponse('imagens privadas')
+            else:
+                return HttpResponse('Algo de errado...')
+
+    return render(request, 'home/upload_image.html')
 
 def Usuario_page(request, usuario_other):
+    jsonDec = json.decoder.JSONDecoder()
+    usuario = request.user
+
     header = header_objeto(request)
     header.logica_login()
 
@@ -60,6 +89,18 @@ def Usuario_page(request, usuario_other):
             usuario_other = usuario_other_data(usuario_encontrado)  # essa variavel guarda o objeto usuario achado, por ex se seu procure por joao vaiter tudo sobre ele, pass, username etc
             achado = True
             break
+
+    if request.method == 'POST':
+        add_friend = request.POST['add_friend']
+
+        get_user_enc_solic = jsonDec.decode(usuario_encontrado.solicitacao) # pega a lista do field do usuario encontrado, e transforma de json para a lista
+        get_user_enc_solic.append(usuario.username)
+        usuario_encontrado.solicitacao = json.dumps(get_user_enc_solic) ## da append do username do usuario que fez a solicitação a lista carregada
+
+        usuario_encontrado.save()
+
+        return HttpResponse('Solicitação enviada para o/a ' + usuario_encontrado.name + '...confirmação: ' + usuario_encontrado.solicitacao)
+
 
     return render(request, 'home/usuario_other_page.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results,
                                                             'usuario_other':usuario_other})

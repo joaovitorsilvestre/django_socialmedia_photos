@@ -11,6 +11,12 @@
             </div>
 
             <div id="conteudo_box">
+                <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                    <input type="submit" name="add_friend" value="Solicitar amizade para o(a) {{usuario_other.name}}"/>
+                </form>
+
+                <p>solicitações para o fulano: {{usuario_other.solicitacao}}</p>
+
             </div>
 
         </div>
