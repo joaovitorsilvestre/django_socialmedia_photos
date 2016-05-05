@@ -27,15 +27,22 @@
         <img src="/media/{{usuario.profile_image}}" id="profile_image" />
         <a class="hide_buttons" href="/accounts/logout">Logout</a>
         <a class="hide_buttons" href="/accounts/edit_profile">Edit Profile</a>
-        <button id="alerta_solicitacao" type="button" onclick="display_solicitacao(true);" onblur="display_solicitacao(false)">{{num_solicitacao}} !</button>
-
+        {% if num_solicitacao != 0 %}
+            <button id="alerta_solicitacao" type="button" onclick="display_solicitacao(true);" >{{num_solicitacao}} !</button>
+        {% endif %}
+        
         <div id="display_solicitacao_box">
             {% for sol in solicitacao %}
                 <div id="item_solicitacao">
                     <p>{{sol}} quer seu amigo!</p>
+                    <form method="post">
+                      {% csrf_token %}
+                        <input type="submit" name="add_friend" value="{{sol}}" />
+                    </form>
                 </div>
             {% endfor %}
         </div>
+
 
     {% endif %}
 </div>

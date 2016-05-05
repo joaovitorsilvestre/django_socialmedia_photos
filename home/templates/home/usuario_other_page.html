@@ -11,11 +11,14 @@
             </div>
 
             <div id="conteudo_box">
-                <form method="post" enctype="multipart/form-data"> {% csrf_token %}
-                    <input type="submit" name="add_friend" value="Solicitar amizade para o(a) {{usuario_other.name}}"/>
-                </form>
-
-                <p>solicitações para o fulano: {{usuario_other.solicitacao}}</p>
+                {% if usuario_other.username not in friends %}
+                    <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                        <input type="submit" name="add_friend" value="Solicitar amizade para o(a) {{usuario_other.name}}"/>
+                    </form>
+                    <p>solicitações para o fulano: {{usuario_other.name}}</p>
+                {% else %}
+                    <p>{{usuario.other.name}} é seu amigo</p>  
+                {% endif %}
 
             </div>
 

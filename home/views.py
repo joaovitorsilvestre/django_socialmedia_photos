@@ -19,27 +19,55 @@ class header_objeto(object):
 
         self.results = json.dumps(self.todos_usuarios)
 
-        try:                                            #precisa disso pq se for um AnonymousUser vai dar problema pois o mesmo não tem o campo solicitacao
+        try:           #precisa disso pq se for um AnonymousUser vai dar problema pois o mesmo não tem o campo solicitacao
             jsonDec = json.decoder.JSONDecoder()
-            self.solicitacao = jsonDec.decode(request.user.solicitacao)
+            self.solicitacao = jsonDec.decode(self.usuario.solicitacao)
+            self.friends = jsonDec.decode(self.usuario.friends)
         except:
             self.solicitacao = []
-            
+            self.friends = []
+
+    def add_friend(self,add_friend):
+        jsonDec = json.decoder.JSONDecoder()
+        lista_friends = jsonDec.decode(self.usuario.friends)  ## le a lista
+        lista_friends.append(add_friend)
+        self.usuario.friends = json.dumps(lista_friends)      #
+
+        ## remove da solicitacao de amizade o amigo adicionado
+        lista_solicitacao = self.solicitacao
+        lista_solicitacao.remove(add_friend)
+        self.usuario.solicitacao = json.dumps(lista_solicitacao)
+
+        #salvando tudo
+        self.usuario.save()
+
 #ESSA classe é utilizada para ser enviada para o html, desta forma garantindo que apenas os dados abaixo sairão do servidor para o cliente
 class usuario_other_data(object):
     def __init__(self,usuario_encontrado):
         jsonDec = json.decoder.JSONDecoder()
         self.name = usuario_encontrado.name
+        self.username = usuario_encontrado.username
         self.solicitacao = jsonDec.decode(usuario_encontrado.solicitacao)
         #self.solicitacao = json.loads(usuario_encontrado.solicitacao)
 
 def Home(request):
     header = header_objeto(request)
+
+    dic_to_html =  {'active':header.active, 'usuario': header.usuario, 'results': header.results,
+                    'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao),
+                    'friends': header.friends}
+
     if header.active == True:
-        return render(request, 'home/home.html', {'active':header.active, 'usuario':header.usuario, 'results': header.results})
+        if request.method == 'POST' and 'add_friend' in request.POST:
+            add_friend = request.POST['add_friend']
+            header.add_friend(add_friend)
+            return render(request, 'home/home.html', dic_to_html)
+
+        return render(request, 'home/home.html', dic_to_html)
+
     else:
         next = header.request.GET.get('next', '/home/')
-        if request.method == 'POST':
+        if request.method == 'POST' and 'username' in request.POST:
             username = header.request.POST['username']
             password = header.request.POST['password']
 
@@ -52,11 +80,9 @@ def Home(request):
                 else:
                     return HttpResponse('Inactive user')
             else:
-                return render(request, 'home/home.html', {'fail':True, 'active':False, 'usuario': header.usuario, 'results': header.results})
+                return render(request, 'home/home.html', dic_to_html)
 
-
-    return render(request, 'home/home.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results,
-                                                'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao)})
+    return render(request, 'home/home.html', dic_to_html)
 
 def Upload_image(request):
     usuario = request.user
@@ -86,7 +112,6 @@ def Usuario_page(request, usuario_other):
     usuario = request.user
 
     header = header_objeto(request)
-    header.logica_login()
 
     for u in Usuario.objects.all():             ## para cada usuario registrado ele vai procurar
         if u.name == usuario_other:          ## pelo que contem o mesmo username que o informado
@@ -94,6 +119,36 @@ def Usuario_page(request, usuario_other):
             usuario_other = usuario_other_data(usuario_encontrado)  # essa variavel guarda o objeto usuario achado, por ex se seu procure por joao vaiter tudo sobre ele, pass, username etc
             achado = True
             break
+            
+    dic_to_html =  {'active':header.active, 'usuario': header.usuario, 'results': header.results,
+                    'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao),
+                    'usuario_other':usuario_other,
+                    'friends': header.friends}
+
+    if header.active == True:
+        if request.method == 'POST' and 'add_friend' in request.POST:
+            add_friend = request.POST['add_friend']
+            header.add_friend(add_friend)
+            return render(request, 'home/home.html', dic_to_html)
+
+        return render(request, 'home/usuario_other_page.html', dic_to_html)
+
+    else:
+        next = header.request.GET.get('next', '/home/')
+        if request.method == 'POST' and 'username' in request.POST:
+            username = header.request.POST['username']
+            password = header.request.POST['password']
+
+            user = authenticate(username=username, password=password) # ele tenta autenticar o usuario, se não conseguir ele retorna None
+
+            if user is not None:   # se o user NÃO retornar None então ele executa
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect(next)
+                else:
+                    return HttpResponse('Inactive user')
+            else:
+                return render(request, 'home/usuario_other_page.html', dic_to_html)
 
     if request.method == 'POST':
         add_friend = request.POST['add_friend']
@@ -107,5 +162,4 @@ def Usuario_page(request, usuario_other):
         return HttpResponse('Solicitação enviada para o/a ' + usuario_encontrado.name + '...confirmação: ' + usuario_encontrado.solicitacao)
 
 
-    return render(request, 'home/usuario_other_page.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results, 'usuario_other':usuario_other,
-                                                            'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao)})
+    return render(request, 'home/usuario_other_page.html', dic_to_html)

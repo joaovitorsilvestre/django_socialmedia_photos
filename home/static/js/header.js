@@ -41,18 +41,18 @@ function filtrar_resultados(texto_pesquisa) {
 
     for (i = 0; i < results.length; i++) {            // para cada item no results
 
-      if (results[i].indexOf(texto_pesquisa) > -1) {       // verifica se o texto digitado está no item atual do for
-          var a = document.createElement("A")
-          var bnt = document.createElement("INPUT");       //cria um elemento input
-          bnt.type = "SUBMIT"                             // define o tipo do input
-          bnt.value = results[i]                            //adiciona o texto ao botao
-          bnt.className = "item_search"
+        if (results[i].indexOf(texto_pesquisa) > -1) {       // verifica se o texto digitado está no item atual do for
+            var a = document.createElement("A")
+            var bnt = document.createElement("INPUT");       //cria um elemento input
+            bnt.type = "SUBMIT"                             // define o tipo do input
+            bnt.value = results[i]                            //adiciona o texto ao botao
+            bnt.className = "item_search"
 
-          a.href = "usuario/".concat(bnt.value)
-          a.appendChild(bnt)
-          display_search_box.appendChild(a);              //adiciona ao div
+            a.href = "/home/usuario/".concat(bnt.value)
+            a.appendChild(bnt)
+            display_search_box.appendChild(a);              //adiciona ao div
 
-          num_itens += 1
+            num_itens += 1
       }
     }
 
