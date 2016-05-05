@@ -1,13 +1,11 @@
-<link rel="stylesheet" type="text/css" href="../../static/css/home.css" >
 
 <!-- PARA PASSAR AS VARIAVEIS DO VIEWS.PY PARA O JV EXTERNO É NECESSARIO NOMEAR ANTES DE CARREGAR O JV EXTERNO, COMO ABAIXO -->
 <script>
     var results = {{results|safe}}
 </script>
 
-<script type="text/javascript" src="../../static/js/home.js">
+<script type="text/javascript" src="../../static/js/header.js">
 </script>
-
 
 <div id="search_box" type="text">
     <input id="search_input" type="text" placeholder="pesquisar..." onkeyup="filtrar_resultados(this.value);"/>
@@ -29,5 +27,15 @@
         <img src="/media/{{usuario.profile_image}}" id="profile_image" />
         <a class="hide_buttons" href="/accounts/logout">Logout</a>
         <a class="hide_buttons" href="/accounts/edit_profile">Edit Profile</a>
+        <button id="alerta_solicitacao" type="button" onclick="display_solicitacao(true);" onblur="display_solicitacao(false)">{{num_solicitacao}} !</button>
+
+        <div id="display_solicitacao_box">
+            {% for sol in solicitacao %}
+                <div id="item_solicitacao">
+                    <p>{{sol}} quer seu amigo!</p>
+                </div>
+            {% endfor %}
+        </div>
+
     {% endif %}
 </div>

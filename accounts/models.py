@@ -23,3 +23,4 @@ class Usuario(AbstractUser):
     profile_image = models.ImageField(null=True, blank=True, upload_to=user_path, default ='default_files/profile_image.png')
     images_public = models.ImageField(null=True, blank=True, upload_to=user_path_public)
     solicitacao = models.TextField(default='[]')
+    friends = models.TextField(default='[]')

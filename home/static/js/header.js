@@ -60,3 +60,13 @@ function filtrar_resultados(texto_pesquisa) {
 
     //return results[0]
 }
+
+function display_solicitacao(on) {
+    var display_solicitacao_box = document.getElementById("display_solicitacao_box")
+    if (on == true){
+      display_solicitacao_box.style.display = "inline"
+    }
+    else {
+      display_solicitacao_box.style.display = "none"
+    }
+}

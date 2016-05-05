@@ -19,6 +19,12 @@ class header_objeto(object):
 
         self.results = json.dumps(self.todos_usuarios)
 
+        try:                                            #precisa disso pq se for um AnonymousUser vai dar problema pois o mesmo não tem o campo solicitacao
+            jsonDec = json.decoder.JSONDecoder()
+            self.solicitacao = jsonDec.decode(request.user.solicitacao)
+        except:
+            self.solicitacao = []
+
     def logica_login(self):
         if self.active == True:
             return render(self.request, 'home/home.html', {'active':True, 'usuario':self.usuario, 'results': self.results})
@@ -51,7 +57,9 @@ def Home(request):
     header = header_objeto(request)
     header.logica_login()                  ## esse metodo faz toda a verificação se o usuario está logado, ou não etc
 
-    return render(request, 'home/home.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results})
+
+    return render(request, 'home/home.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results,
+                                                'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao)})
 
 def Upload_image(request):
     usuario = request.user
@@ -102,5 +110,5 @@ def Usuario_page(request, usuario_other):
         return HttpResponse('Solicitação enviada para o/a ' + usuario_encontrado.name + '...confirmação: ' + usuario_encontrado.solicitacao)
 
 
-    return render(request, 'home/usuario_other_page.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results,
-                                                            'usuario_other':usuario_other})
+    return render(request, 'home/usuario_other_page.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results, 'usuario_other':usuario_other,
+                                                            'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao)})

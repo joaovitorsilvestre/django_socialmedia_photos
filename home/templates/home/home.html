@@ -3,7 +3,8 @@
 <html>
     <head>
         <title>Home</title>
-
+        <link rel="stylesheet" type="text/css" href="../../static/css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../static/css/header.css" />
     </head>
 
     <body style="width:100%; height:90%">
@@ -12,8 +13,12 @@
                 {% include 'home/header.html' %}
             </div>
 
+            {% if active == True %}
+                {% include 'home/usuario_page.html' %}
+            {% else %}
             <div id="conteudo_box">
                 {% include 'home/default.html' %}
+            {% endif %}
             </div>
 
         </div>
