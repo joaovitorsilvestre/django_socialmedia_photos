@@ -24,27 +24,7 @@ class header_objeto(object):
             self.solicitacao = jsonDec.decode(request.user.solicitacao)
         except:
             self.solicitacao = []
-
-    def logica_login(self):
-        if self.active == True:
-            return render(self.request, 'home/home.html', {'active':True, 'usuario':self.usuario, 'results': self.results})
-        else:
-            next = self.request.GET.get('next', '/home/')
-            if self.request.method == 'POST':
-                username = self.request.POST['username']
-                password = self.request.POST['password']
-
-                user = authenticate(username=username, password=password) # ele tenta autenticar o usuario, se não conseguir ele retorna None
-
-                if user is not None:   # se o user NÃO retornar None então ele executa
-                    if user.is_active:
-                        login(self.request, user)
-                        return HttpResponseRedirect(next)
-                    else:
-                        return HttpResponse('Inactive user')
-                else:
-                    return render(self.request, 'home/home.html', {'fail':True, 'active':False, 'usuario': self.usuario, 'results': self.results})
-
+            
 #ESSA classe é utilizada para ser enviada para o html, desta forma garantindo que apenas os dados abaixo sairão do servidor para o cliente
 class usuario_other_data(object):
     def __init__(self,usuario_encontrado):
@@ -55,7 +35,24 @@ class usuario_other_data(object):
 
 def Home(request):
     header = header_objeto(request)
-    header.logica_login()                  ## esse metodo faz toda a verificação se o usuario está logado, ou não etc
+    if header.active == True:
+        return render(request, 'home/home.html', {'active':header.active, 'usuario':header.usuario, 'results': header.results})
+    else:
+        next = header.request.GET.get('next', '/home/')
+        if request.method == 'POST':
+            username = header.request.POST['username']
+            password = header.request.POST['password']
+
+            user = authenticate(username=username, password=password) # ele tenta autenticar o usuario, se não conseguir ele retorna None
+
+            if user is not None:   # se o user NÃO retornar None então ele executa
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect(next)
+                else:
+                    return HttpResponse('Inactive user')
+            else:
+                return render(request, 'home/home.html', {'fail':True, 'active':False, 'usuario': header.usuario, 'results': header.results})
 
 
     return render(request, 'home/home.html', {'active':header.active, 'usuario': header.usuario, 'results': header.results,
