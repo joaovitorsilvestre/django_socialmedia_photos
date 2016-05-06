@@ -13,13 +13,12 @@
             <div id="header_box">
                 {% include 'home/header.html' %}
             </div>
-
-            {% if active == True %}
-                {% include 'home/usuario_page.html' %}
-            {% else %}
             <div id="conteudo_box">
-                {% include 'home/default.html' %}
-            {% endif %}
+                {% if active == True %}
+                    {% include 'home/usuario_page.html' %}
+                {% else %}
+                    {% include 'home/default.html' %}
+                {% endif %}
             </div>
 
         </div>

@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django_socialmedia_photos import settings
 from accounts.models import Usuario
 import json
-
+import os
 
 #ESSA class É DA FUNCIONALIDADE DA HEADER
 class header_objeto(object):
@@ -14,6 +14,7 @@ class header_objeto(object):
         self.usuario = request.user
         self.todos_usuarios = []
         self.todos_usuarios = []
+
         for u in Usuario.objects.all().values_list('name', flat=True):
             self.todos_usuarios.append(u)
 
@@ -55,6 +56,14 @@ class header_objeto(object):
         self.usuario.save()
         add_friend_val.save()
 
+    def get_images(self):
+        images_user = []
+        for root, dirs, files in os.walk("./media/image_profile_users/{}/images_public".format(self.usuario.username, topdown=False)):
+            for name in files:
+                images_user.append(name)
+
+        return images_user
+
 #ESSA classe é utilizada para ser enviada para o html, desta forma garantindo que apenas os dados abaixo sairão do servidor para o cliente
 class usuario_other_data(object):
     def __init__(self,usuario_encontrado):
@@ -70,15 +79,21 @@ def Home(request):
     dic_to_html =  {'active':header.active, 'usuario': header.usuario, 'results': header.results,
                     'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao),
                     'friends': header.friends}
+    ## tem que fazer isso para que se caso for um usuario anonimo não dar problema
+    dic_to_html['images_user'] = header.get_images()  ##adiciona um item ao dicionario, as imagens encontradas no metodo do header
 
+    #### SE O USUARIO ESTA LOGAOD
     if header.active == True:
+
+        ### parte do form de aceitar solicitação de amigo
         if request.method == 'POST' and 'add_friend_val' in request.POST:
             add_friend_val = request.POST['add_friend_val']
             header.add_friend(add_friend_val)
             return render(request, 'home/home.html', dic_to_html)
+        ###
 
         return render(request, 'home/home.html', dic_to_html)
-
+    ## SE O USUARIO ESTÁ OFF
     else:
         next = header.request.GET.get('next', '/home/')
         if request.method == 'POST' and 'username' in request.POST:
@@ -113,7 +128,9 @@ def Upload_image(request):
                 for item in imagens:
                     usuario.images_public = item
                     usuario.save()
+
                 return HttpResponse('imagens upadas com sucesso')
+
             elif public_or_private == 'private':
                 return HttpResponse('imagens privadas')
             else:

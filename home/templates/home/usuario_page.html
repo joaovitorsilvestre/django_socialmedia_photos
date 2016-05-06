@@ -1,6 +1,14 @@
 <div id="friends_box">
     {% for item in friends %}
-        <p>{{item}}</p>
+        <div id="friend_item_box">
+            <a href="/home/usuario/{{item.username}}">{{item}}</a>
+        </div>
+    {% endfor %}
+</div>
+
+<div id="imagens_box">
+    {% for item in images_user %}
+        <img id="item_images_user" src="/media/image_profile_users/{{usuario.username}}/images_public/{{item}}" />
     {% endfor %}
 </div>
 

@@ -2,7 +2,7 @@
     position: absolute;
     z-index: 10;
     width: 15%;
-    height: 70%;
+    height: 80%;
     margin-left: 2%;
     margin-top: 2%;
     border-style: solid;
@@ -11,6 +11,35 @@
     background-color: rgba(1,1,1,0.2)
 }
 
+#friend_item_box {
+    border-style: solid;
+    border-color: rgba(1,1,1,0.1);
+    border-radius: 10%;
+    width: 90%;
+    height: 8%;
+    float: left;
+    margin-left: 5%;
+    background-color: rgba(1,1,1,0.3)
+}
+
+#imagens_box {
+  position: absolute;
+  z-index: 10;
+  width: 75%;
+  height: 80%;
+  margin-left: 20%;
+  margin-top: 2%;
+  border-style: solid;
+  border-radius: 2%;
+  border-color: #204A52;
+  background-color: rgba(1,1,1,0.2)
+}
+
+#item_images_user {
+  width: 100px;
+  height: 100px;
+  
+}
 
 #background_usuario_page {
     width: 100%;
