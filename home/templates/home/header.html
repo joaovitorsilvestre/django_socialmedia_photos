@@ -7,6 +7,10 @@
 <script type="text/javascript" src="../../static/js/header.js">
 </script>
 
+<div id="logo_box">
+    <a href='/home' id="login_link">Home</a>
+</div>
+
 <div id="search_box" type="text">
     <input id="search_input" type="text" placeholder="pesquisar..." onkeyup="filtrar_resultados(this.value);"/>
     <div id="display_search_box">
@@ -30,14 +34,14 @@
         {% if num_solicitacao != 0 %}
             <button id="alerta_solicitacao" type="button" onclick="display_solicitacao(true);" >{{num_solicitacao}} !</button>
         {% endif %}
-        
+
         <div id="display_solicitacao_box">
             {% for sol in solicitacao %}
                 <div id="item_solicitacao">
                     <p>{{sol}} quer seu amigo!</p>
                     <form method="post">
                       {% csrf_token %}
-                        <input type="submit" name="add_friend" value="{{sol}}" />
+                        <input type="submit" name="add_friend_val" value="{{sol}}" />
                     </form>
                 </div>
             {% endfor %}

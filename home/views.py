@@ -27,19 +27,33 @@ class header_objeto(object):
             self.solicitacao = []
             self.friends = []
 
-    def add_friend(self,add_friend):
+    # esse metodo vai adicionar o amigo no field e vice versa para os dois passarem a ter o outro no field
+    def add_friend(self,add_friend_val):
         jsonDec = json.decoder.JSONDecoder()
+        for u in Usuario.objects.all():              ## tenho q fazer isso para transformar a variavel com a string de username
+            if u.username == add_friend_val:         ## se tornar uma variavel com o objeto correspondente ao usuario
+                add_friend_val = u                   # para isso verifico se add_friend_val consta no field username de algum usuario
+
+        ## fazendo para o usuario logado
         lista_friends = jsonDec.decode(self.usuario.friends)  ## le a lista
-        lista_friends.append(add_friend)
+        lista_friends.append(add_friend_val.username)
         self.usuario.friends = json.dumps(lista_friends)      #
 
         ## remove da solicitacao de amizade o amigo adicionado
-        lista_solicitacao = self.solicitacao
-        lista_solicitacao.remove(add_friend)
-        self.usuario.solicitacao = json.dumps(lista_solicitacao)
+        try:
+            lista_solicitacao = self.solicitacao
+            lista_solicitacao.remove(add_friend_val.username)
+            self.usuario.solicitacao = json.dumps(lista_solicitacao)
+        except:
+            pass
 
-        #salvando tudo
+        ## fazendo para ou outro usuario, o que acabou de ser aceito a solicitação
+        lista_friends = jsonDec.decode(add_friend_val.friends)
+        lista_friends.append(self.usuario.username)
+        add_friend_val.friends = json.dumps(lista_friends)
+
         self.usuario.save()
+        add_friend_val.save()
 
 #ESSA classe é utilizada para ser enviada para o html, desta forma garantindo que apenas os dados abaixo sairão do servidor para o cliente
 class usuario_other_data(object):
@@ -58,9 +72,9 @@ def Home(request):
                     'friends': header.friends}
 
     if header.active == True:
-        if request.method == 'POST' and 'add_friend' in request.POST:
-            add_friend = request.POST['add_friend']
-            header.add_friend(add_friend)
+        if request.method == 'POST' and 'add_friend_val' in request.POST:
+            add_friend_val = request.POST['add_friend_val']
+            header.add_friend(add_friend_val)
             return render(request, 'home/home.html', dic_to_html)
 
         return render(request, 'home/home.html', dic_to_html)
@@ -119,17 +133,30 @@ def Usuario_page(request, usuario_other):
             usuario_other = usuario_other_data(usuario_encontrado)  # essa variavel guarda o objeto usuario achado, por ex se seu procure por joao vaiter tudo sobre ele, pass, username etc
             achado = True
             break
-            
+
     dic_to_html =  {'active':header.active, 'usuario': header.usuario, 'results': header.results,
                     'solicitacao': header.solicitacao, 'num_solicitacao': len(header.solicitacao),
                     'usuario_other':usuario_other,
                     'friends': header.friends}
 
     if header.active == True:
-        if request.method == 'POST' and 'add_friend' in request.POST:
-            add_friend = request.POST['add_friend']
-            header.add_friend(add_friend)
-            return render(request, 'home/home.html', dic_to_html)
+        if request.method == 'POST' and 'add_friend_val' in request.POST:
+            add_friend_val = request.POST['add_friend_val']
+            header.add_friend(add_friend_val)
+
+            return render(request, 'home/usuario_other_page.html', dic_to_html)
+
+        if request.method == 'POST' and 'solicitar_friend' in request.POST:
+            solicitar_friend = request.POST['solicitar_friend']
+
+            get_user_enc_solic = jsonDec.decode(usuario_encontrado.solicitacao) # pega a lista do field do usuario encontrado, e transforma de json para a lista
+            get_user_enc_solic.append(usuario.username)
+            usuario_encontrado.solicitacao = json.dumps(get_user_enc_solic) ## da append do username do usuario que fez a solicitação a lista carregada
+
+            usuario_encontrado.save()
+
+            return HttpResponse('Solicitação enviada para o/a ' + usuario_encontrado.name + '...confirmação: ' + usuario_encontrado.solicitacao)
+
 
         return render(request, 'home/usuario_other_page.html', dic_to_html)
 
@@ -149,17 +176,5 @@ def Usuario_page(request, usuario_other):
                     return HttpResponse('Inactive user')
             else:
                 return render(request, 'home/usuario_other_page.html', dic_to_html)
-
-    if request.method == 'POST':
-        add_friend = request.POST['add_friend']
-
-        get_user_enc_solic = jsonDec.decode(usuario_encontrado.solicitacao) # pega a lista do field do usuario encontrado, e transforma de json para a lista
-        get_user_enc_solic.append(usuario.username)
-        usuario_encontrado.solicitacao = json.dumps(get_user_enc_solic) ## da append do username do usuario que fez a solicitação a lista carregada
-
-        usuario_encontrado.save()
-
-        return HttpResponse('Solicitação enviada para o/a ' + usuario_encontrado.name + '...confirmação: ' + usuario_encontrado.solicitacao)
-
 
     return render(request, 'home/usuario_other_page.html', dic_to_html)
