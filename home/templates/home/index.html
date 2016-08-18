@@ -1,0 +1,105 @@
+{% load staticfiles %}
+<html ng-app="index">
+	<head>
+		<link rel="stylesheet" type="text/css" href="{% static 'home/css/bootstrap.min.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'home/css/index.css' %}">
+		<script type="text/javascript" src="{% static 'home/js/lib/angular.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/lib/angular-route.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/lib/clickoutside.directive.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/apps/indexApp.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/controllers/indexCtrl.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/controllers/ownPageCtrl.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/controllers/userPageCtrl.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/config/routeConfig.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/directives/fileDirective.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/services/accountsApi.js' %}"></script>
+		<script type="text/javascript" src="{% static 'home/js/services/servicesApi.js' %}"></script>
+		<title>{{title}}</title>
+	</head>
+	<body ng-controller="indexCtrl">
+		<div id="top_bar">
+			<nav class="navbar navbar-inverse">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					        <span class="sr-only">Toggle navigation</span>
+					        <span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="#">Home</a>
+					</div>	
+						<div id="navbar" class="collapse navbar-collapse">
+							 <ul class="nav navbar-nav">
+							 	<li class="active"><a href="#">Sobre</a></li>
+							 	<li>
+							 		<form class="navbar-form navbar-left" role="search">
+							 			<input class="form-control" type="text" placeholder="procurar por..." ng-model="searchBox" ng-keyup="search(searchBox);showHideResuts(true)" click-outside="showHideResuts(false)"/>	
+							 		</form>
+							 		<div id="results_box" ng-if="showResults">
+								 		<ul class="list-group">
+								 			<span ng-repeat="user in searchResults.users">
+								 				<li class="list-group-item">
+								 					<a href="/home/#/userpage/{$ user $}">{$ user $}</a>
+								 				</li>
+								 			</span>
+								 		</ul>
+								 	</div>	
+							 	</li>
+
+							 	<li ng-if="!logged">
+		 							<form ng-submit="logar(username, password)" class="navbar-form navbar-left" role="search">
+										<input class="form-control" type="text" ng-model="username" placeholder="nome de usuario">
+										<input class="form-control" type="password" ng-model="password" placeholder="senha">
+										<input class="form-control" type="submit" value="Logar">
+									</form>
+									<span class="label label-danger" >{$ errorLogin $}</span>
+							 	</li>
+							 	<li ng-if="logged">
+
+							 		<span class="label label-default">Bem vindo {$ username $}</span>
+							 		
+								 	<div class="btn-group" role="group">
+										<button type="button" class="btn btn-default" ng-click="showHideRequests()">
+											Solicitações <span class="badge">{$ requestsToMe.quantityRequests $}</span>
+										</button>
+									</div>	
+									<div id="request_box">
+										<ul class="list-group" ng-if="showRequests">
+											<span ng-repeat="userRequest in requestsToMe.userRequest" >
+												<li class="list-group-item">{$ userRequest $} quer ser seu amigo
+													<a href="/services/acceptrequest/{$ userRequest $}">Aceitar</a>
+												</li>
+											</span>	
+										</ul>
+									</div>	
+									<span><a href="/accounts/logout">Sair</a></span>
+							 	</li>
+							 </ul>
+						</div>
+				</div>	
+			</nav>
+		</div>
+		<div id="lateral_bar" ng-if="logged">
+			<div id="form_images">
+				<h3>Enviar imagens</h3>
+				<form method="post" action="/services/sendfiles/" enctype="multipart/form-data">
+					{% csrf_token %}
+				    <input class="form-control" type="file" name="images" accept="image/*" multiple>
+				    <input class="form-control" type="submit" value="Enviar"/>
+				</form>
+			</div>
+			<div id="friends_box">
+				<ul class="list-group">
+		 			<span ng-repeat="friend in friends">
+		 				<li class="list-group-item">
+		 					<a href="/home/#/userpage/{$ friend $}">{$ friend $}</a>
+		 				</li>
+		 			</span>
+		 		</ul>
+			</div>
+		</div>
+		<div id="content">
+			<ng-view ng-if="logged"></ng-view>
+			<ng-include ng-if="!logged" src="'/home/defaultpage'"></ng-include>
+		</div>	
+	</body>
+</html>

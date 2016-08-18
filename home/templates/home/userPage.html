@@ -1,0 +1,7 @@
+<div>
+	<h1>Esta é a pagina do {$ ownerPage $}</h1>
+
+	<p ng-if="isFriend">{$ ownerPage $} É seu amigo</p>
+
+	<input type="button" ng-if="!isFriend" ng-click="requestFriend(ownerPage)" value="Solicitar Amizade">
+</div>

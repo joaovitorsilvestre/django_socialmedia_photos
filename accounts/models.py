@@ -1,26 +1,32 @@
+import os
+
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-import json
 
 def user_path(instance, filename):
-    return ('image_profile_users/{}/{}'.format(instance.username, filename))
+    return ('users/{}/{}'.format(instance.username, filename))
 
-def user_path_public(instance, filename):
-    return ('image_profile_users/{}/images_public/{}'.format(instance.username, filename))
+class RequestsFriends(models.Model):
+    user_that_request = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.user_that_request
 
 class Usuario(AbstractUser):
-
-    SEXO_CHOICES= (
-                    ('M', 'Male'),
-                    ('F', 'Female')
-                    )
-
     activation_key = models.CharField(max_length=30)
+    friends = models.ManyToManyField('self', blank=True)
+    request_friends = models.ManyToManyField(RequestsFriends, blank=True)
+    images = models.FileField(null=True, blank=True, upload_to=user_path)
 
-    name = models.CharField(max_length=50, blank=True, default='unknown')
-    gender = models.CharField(max_length=10, choices= SEXO_CHOICES, default='M')
-    profile_image = models.ImageField(null=True, blank=True, upload_to=user_path, default ='default_files/profile_image.png')
-    images_public = models.ImageField(null=True, blank=True, upload_to=user_path_public)
-    solicitacao = models.TextField(default='[]')
-    friends = models.TextField(default='[]')
+    def get_images(self):
+        basedir = settings.BASE_DIR
+        path = basedir + "/media/users/{}".format(self.username)
+        print(path)
+
+        images = []
+        for root, dirs, files in os.walk(path, topdown=False):
+            for name in files:
+                images.append(name)
+
+        return images

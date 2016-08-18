@@ -1,0 +1,17 @@
+<div class="box_images">
+	<div class="row">
+  		<div class="col-sm-2 col-sm-2" ng-repeat="img in selfImages.images_links">
+    		<a class="thumbnail" href="{$ selfImages.path $}/{$ img $}">
+				<img src="{$ selfImages.path $}/{$ img $}">
+				<div class="caption">
+					{$ img $}
+					<div class="btn-group" role="group">
+						<button type="button" class="btn btn-danger">
+							Apagar!
+						</button>
+					</div>	
+				</div>
+			</a>
+		</div>
+	</div>
+</div>	
